@@ -4,9 +4,14 @@ require_once(__DIR__.'/TestHelper.php');
 
 class GameTest extends PHPUnit_Framework_TestCase
 {
+  private $game;
+  private $clock;
 
   public function setUp(){
     $this->game = new Game();
+    $this->clock = new ClockFake();
+    $this->game->setClock($this->clock);
+    $this->game->setTimeout(300);
   }
 
   public function testDeveIniciarOJogo()
@@ -82,6 +87,21 @@ class GameTest extends PHPUnit_Framework_TestCase
     $this->game->openWord('if');
     $this->game->openWord('else');
     $this->assertTrue($this->game->isCompleted());
-  }  
+  }
 
+  public function testJogoEmAndamentoQuantoAindaHaTempo()
+  {
+    $this->game->setWords(array('if', 'else'));
+    $this->game->start();
+    $this->clock->add(150);
+    $this->assertFalse($this->game->isTimeout());
+  }
+
+  public function testJogoExcedidoQuantoTempoEsgotado()
+  {
+    $this->game->setWords(array('if', 'else'));
+    $this->game->start();
+    $this->clock->add(300);
+    $this->assertTrue($this->game->isTimeout());
+  }
 }

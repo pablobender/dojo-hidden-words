@@ -4,15 +4,29 @@ class Game
   private $running = false;
   private $openedWords = array();
   private $words = array();
+  private $clock;
+  private $timeout;
+  private $beginOfGame;
 
   public function setWords(array $words)
   {
     $this->words = $words;
   }
 
+  public function setTimeout($seconds)
+  {
+    $this->timeout = $seconds;
+  }
+
+  public function setClock($clock)
+  {
+    $this->clock = $clock;
+  }
+
   public function start() {
     if (count($this->words) == 0) return false;
 
+    $this->beginOfGame = $this->clock->now();
     $this->running = true;
   }
 
@@ -36,5 +50,10 @@ class Game
 
   public function isCompleted() {
     return $this->getCountOpenedWords() == count($this->words);
+  }
+
+  public function isTimeout()
+  {
+    return ($this->clock->now() - $this->beginOfGame) >= $this->timeout;
   }
 }
